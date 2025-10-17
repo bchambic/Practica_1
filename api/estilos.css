@@ -1,0 +1,12 @@
+#galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        #galeria div {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }

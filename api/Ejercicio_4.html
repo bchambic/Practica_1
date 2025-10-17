@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Buscar Digimon</title>
+</head>
+<body>
+    <h1>Buscar de Digimon</h1>
+    
+    <div>
+        <button onclick="buscarTodos()">Todos los Digimon</button>
+    </div>
+    
+    <div>
+        <input type="text" id="nombreInput" placeholder="Nombre">
+        <button onclick="buscarPorNombre()">Buscar por nombre</button>
+    </div>
+    
+    <div>
+        <input type="text" id="nivelInput" placeholder="Nivel">
+        <button onclick="buscarPorNivel()">Buscar por nivel</button>
+    </div>
+    
+    <table border="1" id="tablaDigimon">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Nivel</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpoTabla"></tbody>
+    </table>
+
+    <script>
+        function buscarTodos() {
+            fetch('https://digimon-api.vercel.app/api/digimon')
+            .then(r => r.json())
+            .then(datos => {
+                mostrarDigimon(datos);
+            });
+        }
+
+        function buscarPorNombre() {
+            let nombre = document.getElementById('nombreInput').value;
+            fetch(`https://digimon-api.vercel.app/api/digimon/name/${nombre}`)
+            .then(r => r.json())
+            .then(datos => {
+                if (Array.isArray(datos)) {
+                    mostrarDigimon(datos);
+                } else {
+                    mostrarDigimon([datos]);
+                }
+            });
+        }
+
+        function buscarPorNivel() {
+            let nivel = document.getElementById('nivelInput').value;
+            fetch(`https://digimon-api.vercel.app/api/digimon/level/${nivel}`)
+            .then(r => r.json())
+            .then(datos => {
+                mostrarDigimon(datos);
+            });
+        }
+
+        function mostrarDigimon(digimons) {
+            let cuerpo = document.getElementById('cuerpoTabla');
+            cuerpo.innerHTML = '';
+            
+            digimons.forEach(d => {
+                let fila = document.createElement('tr');
+                fila.innerHTML = `<td>${d.name}</td><td>${d.level}</td>`;
+                cuerpo.appendChild(fila);
+            });
+        }
+
+    </script>
+</body>
+</html>

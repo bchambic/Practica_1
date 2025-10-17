@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Galeria Pokemon</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <h1>Galería de Pokémon</h1>
+    
+    <div>
+        <input type="text" id="filtroNombre" placeholder="Filtrar por nombre">
+        <button onclick="filtrarPokemon()">Filtrar</button>
+        <button onclick="cargarPagina(0)">Mostrar Todos</button>
+    </div>
+    
+    <div id="galeria"></div>
+    
+    <div>
+        <button onclick="paginaAnterior()">Anterior</button>
+        <span id="paginaInfo">Página 1</span>
+        <button onclick="paginaSiguiente()">Siguiente</button>
+    </div>
+
+    <script>
+        let paginaActual = 0;
+        let filtroActivo = '';
+
+        function cargarPagina(pagina) {
+            paginaActual = pagina;
+            let offset = pagina * 20;
+            
+            fetch(`https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}`)
+            .then(r => r.json())
+            .then(data => {
+                mostrarPokemon(data.results);
+                document.getElementById('paginaInfo').textContent = `Página ${pagina + 1}`;
+            });
+        }
+
+        function filtrarPokemon() {
+            let nombre = document.getElementById('filtroNombre').value;
+            if (nombre) {
+                fetch(`https://pokeapi.co/api/v2/pokemon/${nombre.toLowerCase()}`)
+                .then(r => r.json())
+                .then(pokemon => {
+                    mostrarPokemon([{name: pokemon.name, url: `https://pokeapi.co/api/v2/pokemon/${pokemon.id}/`}]);
+                })
+                .catch(() => alert('Pokémon no encontrado'));
+            } else {
+                cargarPagina(0);
+            }
+        }
+
+        function mostrarPokemon(pokemonList) {
+            let galeria = document.getElementById('galeria');
+            galeria.innerHTML = '';
+            
+            pokemonList.forEach(p => {
+                let id = p.url.split('/')[6];
+                
+                fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
+                .then(r => r.json())
+                .then(pokemonData => {
+                    let div = document.createElement('div');
+                    div.innerHTML = `
+                        <h3>${pokemonData.name} (#${pokemonData.id})</h3>
+                        <img src="${pokemonData.sprites.front_default}" alt="${pokemonData.name}">
+                    `;
+                    galeria.appendChild(div);
+                });
+            });
+        }
+
+        function paginaAnterior() {
+            if (paginaActual > 0) {
+                cargarPagina(paginaActual - 1);
+            }
+        }
+
+        function paginaSiguiente() {
+            cargarPagina(paginaActual + 1);
+        }
+
+
+    </script>
+</body>
+</html>
